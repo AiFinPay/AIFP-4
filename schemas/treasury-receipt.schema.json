@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aifinpay.io/aifp-4/treasury-receipt.schema.json",
+  "title": "AIFP-4 Treasury Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "receipt_id", "intent_id", "intent_hash", "organization_id", "policy_id", "policy_version", "final_status", "issued_at", "key_id", "signature"],
+  "properties": {
+    "protocol_version": { "const": "0.1" },
+    "receipt_id": { "type": "string", "pattern": "^rcp_[A-Za-z0-9_-]+$" },
+    "intent_id": { "type": "string" },
+    "intent_hash": { "type": "string" },
+    "organization_id": { "type": "string" },
+    "source_entity_id": { "type": "string" },
+    "initiating_identity_id": { "type": "string" },
+    "policy_id": { "type": "string" },
+    "policy_version": { "type": "string" },
+    "approval_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "route_quote_id": { "type": "string" },
+    "partner_id": { "type": "string" },
+    "partner_reference": { "type": "string" },
+    "money": {
+      "type": "object",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "string" },
+        "currency": { "type": "string" }
+      }
+    },
+    "fees": { "type": "array", "items": { "type": "object" } },
+    "final_status": { "enum": ["SETTLED", "RECONCILED", "FAILED", "RETURNED", "CANCELLED"] },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "key_id": { "type": "string" },
+    "signature": { "type": "string", "minLength": 32 }
+  }
+}
