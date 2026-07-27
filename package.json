@@ -1,0 +1,23 @@
+{
+  "name": "@aifinpay/aifp-4-reference",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Reference implementation of the AIFP-4 autonomous treasury protocol",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "schemas", "openapi"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  },
+  "license": "LicenseRef-AiFinPay-AIFP4-Source-Available"
+}
