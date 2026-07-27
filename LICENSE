@@ -1,19 +1,47 @@
-AIFP-4 Dual License Notice
+AIFP-4 LAYERED LICENSING NOTICE
+Copyright (c) 2026 AiFinPay. All rights reserved except as expressly licensed.
 
-1. Code, examples, JSON Schemas, OpenAPI files, tests, scripts, SDKs, reference implementations, and automation files are licensed under the Apache License, Version 2.0.
+This repository uses separate licenses for separate material. No license grants rights to AiFinPay names, logos, certification marks, partner network access, production services, confidential information, customer data, or commercial managed-network operation.
 
-Copyright 2026 AiFinPay
+1. OPEN PROTOCOL SPECIFICATION
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use these materials except in compliance with the License. You may obtain a copy of the License at:
+Files under docs/, schemas/, openapi/, examples/ protocol prose, public message definitions, and public interoperability diagrams are licensed under Creative Commons Attribution 4.0 International (CC BY 4.0), unless a file states otherwise.
 
-https://www.apache.org/licenses/LICENSE-2.0
+You may implement the public specification, including commercially, subject to attribution and the separate trademark, certification, patent, regulatory, and partner-network rules in this repository. Implementing the specification does not make an implementation "AiFinPay certified" and does not grant access to the AIFP Global Settlement Network.
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+2. REFERENCE SOURCE CODE
 
-2. Documentation, protocol prose, diagrams, governance text, and explanatory material are licensed under Creative Commons Attribution 4.0 International (CC BY 4.0), unless a file states otherwise.
+Files under src/, tests/, SDK or reference-implementation directories, package configuration, CI, scripts, and future executable reference code are licensed under the PolyForm Noncommercial License 1.0.0, unless a file states otherwise.
 
-https://creativecommons.org/licenses/by/4.0/
+Noncommercial research, evaluation, education, security review, interoperability testing, and internal proof-of-concept use are permitted under that license. Commercial production use, commercial hosted services, resale, white-label use, competing payment or treasury services, and use to provide services to third parties require a separate written commercial license from AiFinPay.
 
-Attribution: "AiFinPay AIFP-4 Protocol".
+Official license text:
+https://polyformproject.org/licenses/noncommercial/1.0.0
 
-3. Trademarks, logos, confidential information, production credentials, partner agreements, customer data, and regulated personal data are not licensed by this file.
+Required Notice: Copyright 2026 AiFinPay. AIFP-4 reference source is licensed for noncommercial use only unless AiFinPay grants a separate written commercial license.
+
+3. COMMERCIAL AND NETWORK LICENSE
+
+Commercial deployment rights, enterprise modules, production partner adapters, managed routing, certification, conformance marks, service-level commitments, and access to contracted licensed settlement partners are available only under a separate written agreement with AiFinPay.
+
+4. TRADEMARKS AND CERTIFICATION
+
+See TRADEMARKS.md. No permission is granted to use AiFinPay, AIFP, AIFP-4, AiFinPay Agent Financial Network, AIFP Global Settlement Network, related logos, or confusingly similar marks as the name of a product, protocol, company, service, token, network, certification, or domain.
+
+5. PATENTS
+
+See PATENTS.md. Publication of this repository does not dedicate inventions to the public domain. Patent rights are granted only where an applicable license expressly grants them. Commercial implementers should obtain a written patent and commercial license from AiFinPay where required.
+
+6. CONTRIBUTIONS
+
+Unless accepted under a separate contributor agreement, contributions are submitted under the license applicable to the contributed file and include the rights reasonably required for AiFinPay to operate, license, defend, and commercialize AIFP-4. Maintainers may require a Contributor License Agreement before accepting material contributions.
+
+7. NO REGULATORY PERMISSION
+
+No license grants permission to provide regulated payment, banking, custody, exchange, money transmission, virtual-asset, e-money, acquiring, issuing, or settlement services. Every deployer is responsible for obtaining appropriate legal advice, licenses, registrations, approvals, and regulated partners.
+
+8. WARRANTY
+
+To the maximum extent permitted by law, materials are provided "AS IS", without warranties or conditions of any kind. AiFinPay is not liable for losses arising from implementation, integration, security failures, regulatory violations, or movement of funds.
+
+This notice is a repository licensing structure, not a substitute for jurisdiction-specific legal advice. AiFinPay should have qualified intellectual-property and financial-regulatory counsel review it before commercial launch.
