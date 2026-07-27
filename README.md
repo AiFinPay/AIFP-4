@@ -4,7 +4,7 @@
 
 <p align="center"><strong>SWIFT-like financial coordination for AI agents, enterprises, departments, partners, and cross-border organizations.</strong></p>
 
-> **Status:** Draft protocol specification. Not a bank, payment institution, money transmitter, custodian, or licensed settlement provider.
+> **Status:** Draft protocol and executable reference implementation. Not a bank, payment institution, money transmitter, custodian, or licensed settlement provider.
 
 ## What AIFP-4 is
 
@@ -67,6 +67,29 @@ flowchart LR
   Receipt --> Ledger[Audit Ledger]
   Ledger --> ERP[ERP / Accounting / Treasury]
 ```
+
+## Executable reference implementation
+
+The repository now includes a strict TypeScript reference core:
+
+- canonical JSON serialization and SHA-256 intent hashing;
+- deterministic policy evaluation without floating-point money arithmetic;
+- explicit payment state machine and invalid-transition rejection;
+- idempotent in-memory protocol orchestrator;
+- approval binding to the immutable intent hash;
+- Ed25519 Treasury Receipt signing and verification;
+- TypeScript types for protocol messages;
+- Vitest security and behavior tests;
+- GitHub Actions typecheck, test, and build quality gate.
+
+```bash
+npm install
+npm run typecheck
+npm test
+npm run build
+```
+
+This is a reference implementation, not a production settlement service. Production requires persistent storage, AIFP-3 integration, authenticated APIs, HSM/MPC key management, partner adapters, regulated onboarding, monitoring, reconciliation, incident response, and independent security review.
 
 ## Global partner model
 
@@ -157,6 +180,8 @@ rules:
 - [`docs/aifp4/01-core-specification.md`](docs/aifp4/01-core-specification.md) — normative protocol specification.
 - [`openapi/aifp-4.openapi.yaml`](openapi/aifp-4.openapi.yaml) — OpenAPI 3.1 contract.
 - [`schemas/`](schemas/) — machine-readable JSON schemas.
+- [`src/`](src/) — executable TypeScript reference core.
+- [`tests/`](tests/) — reference implementation tests.
 - [`examples/`](examples/) — reference workflows.
 - [`ROADMAP.md`](ROADMAP.md) — phased implementation plan.
 
@@ -174,6 +199,15 @@ Large-value treasury transfers require caps, minimum fees, flat fees, or negotia
 
 AIFP-4 is a technical and messaging protocol. The protocol specification does not grant financial permissions, replace legal advice, or make an unlicensed entity eligible to provide regulated services. Implementers must use licensed providers and comply with applicable law in every relevant jurisdiction.
 
-## License
+## Licensing and protection
 
-Code, schemas, examples, tests, and machine-readable specifications are licensed under Apache-2.0. Documentation and protocol prose are licensed under CC BY 4.0 unless a file states otherwise.
+AIFP-4 uses layered licensing:
+
+- public protocol specifications, schemas, OpenAPI and interoperability documentation: CC BY 4.0;
+- executable reference source: PolyForm Noncommercial 1.0.0 unless a file states otherwise;
+- production commercial use, managed services, white-labeling, enterprise modules, network access and certification: separate AiFinPay agreement;
+- AiFinPay and AIFP names, logos and certification marks: reserved under [`TRADEMARKS.md`](TRADEMARKS.md);
+- patent rights and filing position: [`PATENTS.md`](PATENTS.md);
+- commercial rights framework: [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md).
+
+Read [`LICENSE`](LICENSE) before using any repository material. An open protocol can be independently implemented; the licenses do not permit competitors to copy the restricted reference code commercially or present forks as official AiFinPay products.
