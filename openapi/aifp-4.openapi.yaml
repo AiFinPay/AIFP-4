@@ -1,0 +1,318 @@
+openapi: 3.1.0
+info:
+  title: AIFP-4 Global Treasury Protocol API
+  version: 0.1.0-draft
+  description: Global treasury messaging and settlement orchestration for autonomous organizations through licensed execution partners.
+servers:
+  - url: https://api.example.aifp4.org/v1
+    description: Reference placeholder; not a production AiFinPay endpoint
+security:
+  - bearerAuth: []
+paths:
+  /payment-intents:
+    post:
+      summary: Create a payment intent
+      operationId: createPaymentIntent
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, minLength: 16, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentIntentCreate'
+      responses:
+        '201':
+          description: Intent created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentIntent' }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /payment-intents/{intent_id}:
+    get:
+      summary: Read payment intent and current state
+      operationId: getPaymentIntent
+      parameters:
+        - $ref: '#/components/parameters/IntentId'
+      responses:
+        '200':
+          description: Current intent
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentIntent' }
+        '404': { $ref: '#/components/responses/Error' }
+  /payment-intents/{intent_id}/authorize:
+    post:
+      summary: Evaluate identity, authority, budget, and policy
+      operationId: authorizePaymentIntent
+      parameters:
+        - $ref: '#/components/parameters/IntentId'
+      responses:
+        '200':
+          description: Authorization decision
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthorizationDecision' }
+        '409': { $ref: '#/components/responses/Error' }
+  /payment-intents/{intent_id}/approvals:
+    post:
+      summary: Submit an approval decision
+      operationId: submitApproval
+      parameters:
+        - $ref: '#/components/parameters/IntentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApprovalDecision' }
+      responses:
+        '201':
+          description: Approval recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRecord' }
+  /payment-intents/{intent_id}/route-quotes:
+    post:
+      summary: Discover eligible licensed-partner routes
+      operationId: createRouteQuotes
+      parameters:
+        - $ref: '#/components/parameters/IntentId'
+      responses:
+        '200':
+          description: Eligible route quotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RouteQuote' }
+  /payment-intents/{intent_id}/execute:
+    post:
+      summary: Send an approved settlement instruction to the selected partner
+      operationId: executePaymentIntent
+      parameters:
+        - $ref: '#/components/parameters/IntentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [route_quote_id]
+              properties:
+                route_quote_id: { type: string }
+      responses:
+        '202':
+          description: Settlement instruction accepted for processing
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SettlementStatus' }
+  /payment-intents/{intent_id}/receipt:
+    get:
+      summary: Retrieve the verifiable treasury receipt
+      operationId: getTreasuryReceipt
+      parameters:
+        - $ref: '#/components/parameters/IntentId'
+      responses:
+        '200':
+          description: Signed treasury receipt
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TreasuryReceipt' }
+  /partners/capabilities:
+    get:
+      summary: List active signed partner capability manifests available to the caller
+      operationId: listPartnerCapabilities
+      responses:
+        '200':
+          description: Partner capabilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PartnerCapability' }
+  /webhooks/partner-events:
+    post:
+      summary: Receive signed partner settlement events
+      operationId: receivePartnerEvent
+      security:
+        - partnerSignature: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PartnerEvent' }
+      responses:
+        '204': { description: Event accepted idempotently }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    partnerSignature:
+      type: apiKey
+      in: header
+      name: AIFP-Partner-Signature
+  parameters:
+    IntentId:
+      in: path
+      name: intent_id
+      required: true
+      schema: { type: string, pattern: '^pi_[A-Za-z0-9_-]+$' }
+  responses:
+    Error:
+      description: Protocol error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    Money:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: { type: string, pattern: '^[0-9]+(\.[0-9]+)?$' }
+        currency: { type: string, minLength: 3, maxLength: 12 }
+    PaymentIntentCreate:
+      type: object
+      required: [organization_id, source_entity_id, initiating_identity_id, beneficiary_id, money, purpose_code, expires_at, nonce]
+      properties:
+        organization_id: { type: string }
+        source_entity_id: { type: string }
+        department_id: { type: string }
+        initiating_identity_id: { type: string }
+        beneficiary_id: { type: string }
+        money: { $ref: '#/components/schemas/Money' }
+        purpose_code: { type: string }
+        requested_execution_date: { type: string, format: date }
+        expires_at: { type: string, format: date-time }
+        nonce: { type: string }
+        metadata: { type: object, additionalProperties: true }
+    PaymentIntent:
+      allOf:
+        - $ref: '#/components/schemas/PaymentIntentCreate'
+        - type: object
+          required: [intent_id, state, created_at, intent_hash]
+          properties:
+            intent_id: { type: string }
+            state: { $ref: '#/components/schemas/State' }
+            created_at: { type: string, format: date-time }
+            intent_hash: { type: string }
+    State:
+      type: string
+      enum: [DRAFT, SUBMITTED, DENIED, APPROVAL_REQUIRED, AUTHORIZED, REJECTED, EXPIRED, QUOTING, ROUTE_SELECTED, NO_ROUTE, INSTRUCTION_SENT, PARTNER_REVIEW, COMPLIANCE_HOLD, ACCEPTED, PROCESSING, SETTLED, RECONCILED, FAILED, RETURNED, CANCELLED]
+    AuthorizationDecision:
+      type: object
+      required: [intent_id, decision, policy_id, policy_version, reasons]
+      properties:
+        intent_id: { type: string }
+        decision: { type: string, enum: [AUTHORIZED, DENIED, APPROVAL_REQUIRED] }
+        policy_id: { type: string }
+        policy_version: { type: string }
+        reasons:
+          type: array
+          items: { type: string }
+        required_approvals: { type: integer, minimum: 0 }
+    ApprovalDecision:
+      type: object
+      required: [approver_identity_id, decision, intent_hash, expires_at]
+      properties:
+        approver_identity_id: { type: string }
+        decision: { type: string, enum: [APPROVE, REJECT] }
+        intent_hash: { type: string }
+        reason: { type: string }
+        expires_at: { type: string, format: date-time }
+        signature: { type: string }
+    ApprovalRecord:
+      allOf:
+        - $ref: '#/components/schemas/ApprovalDecision'
+        - type: object
+          required: [approval_id, recorded_at]
+          properties:
+            approval_id: { type: string }
+            recorded_at: { type: string, format: date-time }
+    RouteQuote:
+      type: object
+      required: [route_quote_id, partner_id, rail, source, destination, fees, expires_at]
+      properties:
+        route_quote_id: { type: string }
+        partner_id: { type: string }
+        rail: { type: string }
+        source: { $ref: '#/components/schemas/Money' }
+        destination: { $ref: '#/components/schemas/Money' }
+        fees:
+          type: array
+          items:
+            type: object
+            required: [category, money]
+            properties:
+              category: { type: string }
+              money: { $ref: '#/components/schemas/Money' }
+        estimated_settlement_seconds: { type: integer }
+        reversible: { type: boolean }
+        expires_at: { type: string, format: date-time }
+    SettlementStatus:
+      type: object
+      required: [instruction_id, intent_id, status, updated_at]
+      properties:
+        instruction_id: { type: string }
+        intent_id: { type: string }
+        partner_reference: { type: string }
+        status: { $ref: '#/components/schemas/State' }
+        updated_at: { type: string, format: date-time }
+    TreasuryReceipt:
+      type: object
+      required: [receipt_id, intent_id, intent_hash, organization_id, policy_version, final_status, issued_at, key_id, signature]
+      properties:
+        receipt_id: { type: string }
+        intent_id: { type: string }
+        intent_hash: { type: string }
+        organization_id: { type: string }
+        policy_version: { type: string }
+        approvals: { type: array, items: { type: string } }
+        route_quote_id: { type: string }
+        partner_id: { type: string }
+        partner_reference: { type: string }
+        final_status: { $ref: '#/components/schemas/State' }
+        issued_at: { type: string, format: date-time }
+        key_id: { type: string }
+        signature: { type: string }
+    PartnerCapability:
+      type: object
+      required: [partner_id, legal_entity, jurisdictions, currencies, rails, status, manifest_version, signature]
+      properties:
+        partner_id: { type: string }
+        legal_entity: { type: string }
+        license_references: { type: array, items: { type: string } }
+        jurisdictions: { type: array, items: { type: string, minLength: 2, maxLength: 2 } }
+        source_countries: { type: array, items: { type: string } }
+        destination_countries: { type: array, items: { type: string } }
+        currencies: { type: array, items: { type: string } }
+        rails: { type: array, items: { type: string } }
+        status: { type: string, enum: [active, suspended, retired] }
+        manifest_version: { type: string }
+        signature: { type: string }
+    PartnerEvent:
+      type: object
+      required: [event_id, event_type, aggregate_id, sequence, occurred_at, producer, data]
+      properties:
+        event_id: { type: string }
+        event_type: { type: string }
+        aggregate_id: { type: string }
+        sequence: { type: integer, minimum: 1 }
+        occurred_at: { type: string, format: date-time }
+        producer: { type: string }
+        data: { type: object, additionalProperties: true }
+    Error:
+      type: object
+      required: [code, message, retryable, correlation_id]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        retryable: { type: boolean }
+        correlation_id: { type: string }
+        remediation_category: { type: string }
