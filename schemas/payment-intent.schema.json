@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aifinpay.io/aifp-4/payment-intent.schema.json",
+  "title": "AIFP-4 Payment Intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "intent_id", "organization_id", "source_entity_id", "initiating_identity_id", "beneficiary_id", "money", "purpose_code", "created_at", "expires_at", "idempotency_key", "nonce", "intent_hash"],
+  "properties": {
+    "protocol_version": { "const": "0.1" },
+    "intent_id": { "type": "string", "pattern": "^pi_[A-Za-z0-9_-]+$" },
+    "organization_id": { "type": "string", "pattern": "^org_[A-Za-z0-9_-]+$" },
+    "source_entity_id": { "type": "string", "pattern": "^ent_[A-Za-z0-9_-]+$" },
+    "department_id": { "type": "string" },
+    "initiating_identity_id": { "type": "string" },
+    "beneficiary_id": { "type": "string", "pattern": "^ben_[A-Za-z0-9_-]+$" },
+    "money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?$" },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 12 }
+      }
+    },
+    "purpose_code": { "type": "string", "minLength": 2, "maxLength": 64 },
+    "requested_execution_date": { "type": "string", "format": "date" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "idempotency_key": { "type": "string", "minLength": 16, "maxLength": 128 },
+    "nonce": { "type": "string", "minLength": 16, "maxLength": 128 },
+    "intent_hash": { "type": "string", "minLength": 32 },
+    "metadata": { "type": "object", "additionalProperties": true }
+  }
+}
